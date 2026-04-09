@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Risk Calculator Mobile</title>
+  <style>
+    :root{
+      --bg:#f4f4f5;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --accent:#111827;
+      --green:#047857;
+      --green-bg:#d1fae5;
+      --red:#b91c1c;
+      --red-bg:#fee2e2;
+      --warn:#92400e;
+      --warn-bg:#fffbeb;
+      --warn-line:#fcd34d;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      padding:12px;
+    }
+    .app{max-width:680px;margin:0 auto}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:14px;
+      margin-top:12px;
+    }
+    h1{
+      margin:0 0 8px;
+      font-size:26px;
+      line-height:1.15;
+    }
+    .desc{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+      margin:0;
+    }
+    .pill{
+      display:inline-block;
+      margin-bottom:10px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .field label{
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      color:#374151;
+      margin:0 0 6px;
+    }
+    input, select{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px 12px;
+      font-size:16px;
+      outline:none;
+      background:#fff;
+      color:var(--text);
+    }
+    .hint{
+      margin-top:6px;
+      font-size:12px;
+      line-height:1.4;
+      color:var(--muted);
+    }
+    .tag{
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:10px;
+    }
+    .long{background:var(--green-bg); color:var(--green)}
+    .short{background:var(--red-bg); color:var(--red)}
+    .metrics{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .metric{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      background:#fff;
+      min-height:92px;
+    }
+    .metric.accent{
+      background:var(--accent);
+      color:#fff;
+      border-color:var(--accent);
+    }
+    .metric-label{
+      font-size:11px;
+      line-height:1.3;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-weight:700;
+      color:var(--muted);
+    }
+    .metric.accent .metric-label,
+    .metric.accent .metric-sub{
+      color:#d1d5db;
+    }
+    .metric-value{
+      margin-top:8px;
+      font-size:24px;
+      line-height:1.1;
+      font-weight:700;
+      word-break:break-word;
+    }
+    .metric-sub{
+      margin-top:6px;
+      font-size:12px;
+      line-height:1.4;
+      color:var(--muted);
+    }
+    .rr{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:10px;
+    }
+    .alert{
+      margin-top:12px;
+      background:var(--warn-bg);
+      color:var(--warn);
+      border:1px solid var(--warn-line);
+      border-radius:16px;
+      padding:12px;
+      font-size:13px;
+      line-height:1.5;
+    }
+    .alert strong{display:block;margin-bottom:6px}
+    .alert ul{margin:0;padding-left:18px}
+    .small{
+      margin-top:8px;
+      font-size:12px;
+      line-height:1.5;
+      color:var(--muted);
+    }
+    .copybox{
+      width:100%;
+      min-height:150px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      font-size:14px;
+      line-height:1.5;
+      background:#fff;
+      color:var(--text);
+      resize:vertical;
+    }
+    .btn{
+      width:100%;
+      min-height:48px;
+      border:none;
+      border-radius:14px;
+      background:#111827;
+      color:#fff;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      margin-top:10px;
+    }
+    @media (max-width:440px){
+      .grid,.metrics,.rr{grid-template-columns:1fr}
+      h1{font-size:23px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <div class="pill">mobile web / auto recalc</div>
+      <h1>Калькулятор риска от точки A до стопа</h1>
+      <p class="desc">Без кнопки пересчёта: меняешь любое поле — расчёт обновляется сразу. Основной риск считается только от точки A до SL.</p>
+    </div>
+
+    <div class="card">
+      <div class="grid">
+        <div class="field">
+          <label for="symbol">Тикер</label>
+          <input id="symbol" value="LTCUSDT">
+        </div>
+        <div class="field">
+          <label for="direction">Направление</label>
+          <select id="direction">
+            <option value="LONG">Лонг</option>
+            <option value="SHORT">Шорт</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="deposit">Депозит, $</label>
+          <input id="deposit" inputmode="decimal" value="1000">
+        </div>
+        <div class="field">
+          <label for="riskPercent">Риск, %</label>
+          <input id="riskPercent" inputmode="decimal" value="1">
+        </div>
+
+        <div class="field">
+          <label for="leverage">Плечо, x</label>
+          <input id="leverage" inputmode="decimal" value="10">
+        </div>
+        <div class="field">
+          <label for="entryA">Точка входа A</label>
+          <input id="entryA" inputmode="decimal" value="57.23">
+        </div>
+
+        <div class="field">
+          <label for="stop">SL</label>
+          <input id="stop" inputmode="decimal" value="54.83">
+        </div>
+        <div class="field">
+          <label for="avgPercent">Процент B от пути к стопу, %</label>
+          <input id="avgPercent" inputmode="decimal" placeholder="например 50">
+          <div class="hint">50 = точка B на половине пути от A до SL.</div>
+        </div>
+
+        <div class="field">
+          <label for="entryB">Цена усреднения B</label>
+          <input id="entryB" inputmode="decimal" placeholder="если есть по сетапу">
+          <div class="hint">Если введена руками, она главнее процента.</div>
+        </div>
+
+        <div class="field">
+          <label for="tp1">TP1</label>
+          <input id="tp1" inputmode="decimal" value="61.13">
+        </div>
+        <div class="field">
+          <label for="tp2">TP2</label>
+          <input id="tp2" inputmode="decimal" value="64.27">
+        </div>
+        <div class="field">
+          <label for="tp3">TP3</label>
+          <input id="tp3" inputmode="decimal" value="66.83">
+        </div>
+      </div>
+
+      <div id="errors" class="alert" style="display:none;"></div>
+      <div class="small">Если страница открыта как обычный сайт по ссылке, на iPhone и Android это работает стабильнее, чем локальный preview html-файла.</div>
+    </div>
+
+    <div class="card">
+      <div id="directionTag" class="tag long">Лонг</div>
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-label">Тикер</div>
+          <div class="metric-value" id="viewSymbol">LTCUSDT</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Точка A</div>
+          <div class="metric-value" id="viewEntryA">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">SL</div>
+          <div class="metric-value" id="viewStop">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Дистанция до SL</div>
+          <div class="metric-value" id="stopDistance">—</div>
+          <div class="metric-sub" id="stopDistancePct">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="metrics">
+        <div class="metric accent">
+          <div class="metric-label">Риск в деньгах</div>
+          <div class="metric-value" id="riskUsd">$—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Размер позиции</div>
+          <div class="metric-value" id="qty">—</div>
+          <div class="metric-sub">Qty = Risk / |A − SL|</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Номинал позиции</div>
+          <div class="metric-value" id="notional">$—</div>
+          <div class="metric-sub">Qty × A</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Нужная маржа</div>
+          <div class="metric-value" id="margin">$—</div>
+          <div class="metric-sub" id="marginSub">При выбранном плече</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Проверка убытка</div>
+          <div class="metric-value" id="lossCheck">$—</div>
+          <div class="metric-sub">Должно совпадать с риском</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Логика стопа</div>
+          <div class="metric-value" id="stopLogic">—</div>
+          <div class="metric-sub" id="stopLogicSub">Нет данных</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-label">Цена B</div>
+          <div class="metric-value" id="viewEntryB">—</div>
+          <div class="metric-sub" id="entryBSource">Не задана</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Путь B до стопа</div>
+          <div class="metric-value" id="bToSl">—</div>
+          <div class="metric-sub" id="bToSlPct">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Доля пути A→SL</div>
+          <div class="metric-value" id="viewAvgPercent">—</div>
+          <div class="metric-sub">Сколько % пути до стопа занимает B</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Средняя A/B</div>
+          <div class="metric-value" id="avgAB">—</div>
+          <div class="metric-sub">Справочно: (A + B) / 2</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="rr">
+        <div class="metric">
+          <div class="metric-label">TP1</div>
+          <div class="metric-value" id="rr1">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">TP2</div>
+          <div class="metric-value" id="rr2">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">TP3</div>
+          <div class="metric-value" id="rr3">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="metric-label">Текст для копирования</div>
+      <textarea id="copyText" class="copybox" readonly></textarea>
+      <button id="copyBtn" class="btn" type="button">Скопировать результат</button>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      function el(id){ return document.getElementById(id); }
+
+      function toNumber(value){
+        if(value == null) return null;
+        var normalized = String(value).replace(/\s/g, "").replace(/,/g, ".");
+        var num = Number(normalized);
+        return isFinite(num) ? num : null;
+      }
+
+      function fmt(value, digits){
+        if(typeof digits === "undefined") digits = 2;
+        if(!isFinite(value)) return "—";
+        return new Intl.NumberFormat("ru-RU", {
+          minimumFractionDigits: digits,
+          maximumFractionDigits: digits
+        }).format(value);
+      }
+
+      function fmtSmart(value){
+        if(!isFinite(value)) return "—";
+        if(Math.abs(value) >= 1000) return fmt(value, 2);
+        if(Math.abs(value) >= 1) return fmt(value, 4);
+        return fmt(value, 6);
+      }
+
+      function setText(id, value){
+        el(id).textContent = value;
+      }
+
+      function calcTpRR(direction, entry, stop, tp){
+        if(!(isFinite(entry) && isFinite(stop) && isFinite(tp))) return null;
+        var risk = Math.abs(entry - stop);
+        if(!risk) return null;
+        var reward = Math.abs(tp - entry);
+        var isLong = direction === "LONG";
+        var isValid = isLong ? tp > entry : tp < entry;
+        if(!isValid) return null;
+        return reward / risk;
+      }
+
+      function buildEntryB(direction, entryA, stop, avgPercent, entryBManual){
+        var stopDistance, entryB;
+        if(isFinite(entryBManual)){
+          return { entryB: entryBManual, source: "Задана вручную" };
+        }
+        if(isFinite(avgPercent)){
+          stopDistance = Math.abs(entryA - stop);
+          if(direction === "LONG"){
+            entryB = entryA - stopDistance * (avgPercent / 100);
+          } else {
+            entryB = entryA + stopDistance * (avgPercent / 100);
+          }
+          return { entryB: entryB, source: "Посчитана из %" };
+        }
+        return { entryB: null, source: "Не задана" };
+      }
+
+      function showErrors(errors){
+        var box = el("errors");
+        var html = "", i;
+        if(!errors.length){
+          box.style.display = "none";
+          box.innerHTML = "";
+          return;
+        }
+        html = "<strong>Что нужно исправить:</strong><ul>";
+        for(i = 0; i < errors.length; i++){
+          html += "<li>" + errors[i] + "</li>";
+        }
+        html += "</ul>";
+        box.innerHTML = html;
+        box.style.display = "block";
+      }
+
+      function recalc(){
+        var symbol = el("symbol").value || "—";
+        var direction = el("direction").value;
+        var deposit = toNumber(el("deposit").value);
+        var riskPercent = toNumber(el("riskPercent").value);
+        var leverage = toNumber(el("leverage").value);
+        var entryA = toNumber(el("entryA").value);
+        var stop = toNumber(el("stop").value);
+        var avgPercent = toNumber(el("avgPercent").value);
+        var entryBManual = toNumber(el("entryB").value);
+        var tp1 = toNumber(el("tp1").value);
+        var tp2 = toNumber(el("tp2").value);
+        var tp3 = toNumber(el("tp3").value);
+
+        var errors = [];
+        var stopDistanceAbs, stopDistancePct, riskUsd, qty, notional, margin, lossCheck, stopLogicOk;
+        var entryBInfo, entryB, entryBPathPct, bToSl, bToSlPct, avgAB;
+        var rr1, rr2, rr3, copyText, tag;
+
+        if(!(isFinite(deposit) && deposit > 0)) errors.push("Введите корректный депозит.");
+        if(!(isFinite(riskPercent) && riskPercent > 0)) errors.push("Введите корректный риск в %.");
+        if(!(isFinite(entryA))) errors.push("Введите корректную точку A.");
+        if(!(isFinite(stop))) errors.push("Введите корректный SL.");
+
+        setText("viewSymbol", symbol);
+        setText("viewEntryA", fmtSmart(entryA));
+        setText("viewStop", fmtSmart(stop));
+
+        tag = el("directionTag");
+        if(direction === "LONG"){
+          tag.className = "tag long";
+          tag.textContent = "Лонг";
+        } else {
+          tag.className = "tag short";
+          tag.textContent = "Шорт";
+        }
+
+        if(!errors.length){
+          stopDistanceAbs = Math.abs(entryA - stop);
+          if(stopDistanceAbs === 0){
+            errors.push("Точка A и SL совпадают.");
+          } else {
+            stopDistancePct = (stopDistanceAbs / entryA) * 100;
+            riskUsd = deposit * (riskPercent / 100);
+            qty = riskUsd / stopDistanceAbs;
+            notional = qty * entryA;
+            margin = (isFinite(leverage) && leverage > 0) ? (notional / leverage) : null;
+            lossCheck = qty * stopDistanceAbs;
+            stopLogicOk = direction === "LONG" ? stop < entryA : stop > entryA;
+
+            rr1 = calcTpRR(direction, entryA, stop, tp1);
+            rr2 = calcTpRR(direction, entryA, stop, tp2);
+            rr3 = calcTpRR(direction, entryA, stop, tp3);
+
+            entryBInfo = buildEntryB(direction, entryA, stop, avgPercent, entryBManual);
+            entryB = entryBInfo.entryB;
+
+            if(isFinite(entryB)){
+              entryBPathPct = Math.abs(entryA - entryB) / stopDistanceAbs * 100;
+              bToSl = Math.abs(entryB - stop);
+              bToSlPct = (bToSl / entryB) * 100;
+              avgAB = (entryA + entryB) / 2;
+            }
+
+            setText("stopDistance", "$" + fmtSmart(stopDistanceAbs));
+            setText("stopDistancePct", fmt(stopDistancePct, 2) + "% от точки A");
+            setText("riskUsd", "$" + fmt(riskUsd, 2));
+            setText("qty", fmtSmart(qty));
+            setText("notional", "$" + fmt(notional, 2));
+            setText("margin", margin == null ? "—" : "$" + fmt(margin, 2));
+            setText("marginSub", "При плече x" + (el("leverage").value || "—"));
+            setText("lossCheck", "$" + fmt(lossCheck, 2));
+            setText("stopLogic", stopLogicOk ? "OK" : "Проверь");
+            setText("stopLogicSub", stopLogicOk ? "Стоп по правильную сторону от A" : "Для лонга SL ниже A, для шорта выше A");
+
+            setText("viewEntryB", fmtSmart(entryB));
+            setText("entryBSource", entryBInfo.source);
+            setText("viewAvgPercent", isFinite(entryBPathPct) ? fmt(entryBPathPct, 2) + "%" : "—");
+            setText("bToSl", isFinite(bToSl) ? "$" + fmtSmart(bToSl) : "—");
+            setText("bToSlPct", isFinite(bToSlPct) ? fmt(bToSlPct, 2) + "% от B" : "—");
+            setText("avgAB", fmtSmart(avgAB));
+
+            setText("rr1", rr1 ? fmt(rr1, 2) + "R" : "—");
+            setText("rr2", rr2 ? fmt(rr2, 2) + "R" : "—");
+            setText("rr3", rr3 ? fmt(rr3, 2) + "R" : "—");
+
+            copyText = [
+              "Тикер: " + symbol,
+              "Направление: " + (direction === "LONG" ? "Лонг" : "Шорт"),
+              "Депозит: $" + fmt(deposit, 2),
+              "Риск: " + fmt(riskPercent, 2) + "% = $" + fmt(riskUsd, 2),
+              "A: " + fmtSmart(entryA),
+              "SL: " + fmtSmart(stop),
+              "Дистанция до SL: " + fmtSmart(stopDistanceAbs) + " (" + fmt(stopDistancePct, 2) + "%)",
+              "Размер позиции: " + fmtSmart(qty),
+              "Номинал: $" + fmt(notional, 2),
+              "Маржа: " + (margin == null ? "—" : "$" + fmt(margin, 2)),
+              "B: " + (isFinite(entryB) ? fmtSmart(entryB) + " [" + entryBInfo.source + "]" : "—"),
+              "TP1: " + (rr1 ? fmt(rr1, 2) + "R" : "—"),
+              "TP2: " + (rr2 ? fmt(rr2, 2) + "R" : "—"),
+              "TP3: " + (rr3 ? fmt(rr3, 2) + "R" : "—")
+            ].join("\n");
+            el("copyText").value = copyText;
+          }
+        }
+
+        if(errors.length){
+          setText("stopDistance", "—");
+          setText("stopDistancePct", "—");
+          setText("riskUsd", "$—");
+          setText("qty", "—");
+          setText("notional", "$—");
+          setText("margin", "—");
+          setText("marginSub", "При выбранном плече");
+          setText("lossCheck", "$—");
+          setText("stopLogic", "—");
+          setText("stopLogicSub", "Нет данных");
+          setText("viewEntryB", "—");
+          setText("entryBSource", "Не задана");
+          setText("viewAvgPercent", "—");
+          setText("bToSl", "—");
+          setText("bToSlPct", "—");
+          setText("avgAB", "—");
+          setText("rr1", "—");
+          setText("rr2", "—");
+          setText("rr3", "—");
+          el("copyText").value = "Ошибка в данных. Проверь поля.";
+        }
+
+        showErrors(errors);
+      }
+
+      var ids = ["symbol","direction","deposit","riskPercent","leverage","entryA","stop","avgPercent","entryB","tp1","tp2","tp3"];
+      var i;
+      for(i = 0; i < ids.length; i++){
+        el(ids[i]).addEventListener("input", recalc);
+        el(ids[i]).addEventListener("change", recalc);
+      }
+
+      el("copyBtn").addEventListener("click", function(){
+        var box = el("copyText");
+        box.focus();
+        box.select();
+        try{
+          document.execCommand("copy");
+        }catch(e){}
+      });
+
+      recalc();
+    })();
+  </script>
+</body>
+</html>
