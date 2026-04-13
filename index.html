@@ -1,400 +1,1131 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-git add index.html
-git commit -m "metrika"
-git push origin main
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Натальная карта — персональный астрологический анализ</title>
-<meta name="description" content="Персональный астрологический отчёт 27 страниц: планеты, дома, нумерология, Таро, прогноз. Всего 800 ₽.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --gold:#a57c3a;
-    --gold-lt:#cdb07a;
-    --ink:#1b1710;
-    --muted:#6a5e4e;
-    --bg:#f5f0e6;
-    --paper:#fefcf7;
-    --line:#ddd0b6;
-    --card:#faf5ec;
-  }
-  html{scroll-behavior:smooth}
-  body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:Georgia,"Times New Roman",serif;
-    line-height:1.75;
-    font-size:16px;
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #0a0a0f;
+  --bg-card: #12121a;
+  --bg-card-hover: #1a1a26;
+  --gold: #c9a84c;
+  --gold-light: #e4cc7a;
+  --gold-dim: #8a7235;
+  --text: #e8e4dc;
+  --text-dim: #9a9590;
+  --text-faint: #5a5652;
+  --accent: #d4a853;
+  --violet: #6b5b8a;
+  --violet-dim: #3d3450;
+  --rose: #c47d7d;
+  --border: rgba(201, 168, 76, 0.12);
+  --border-light: rgba(201, 168, 76, 0.06);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text);
+  font-family: 'Raleway', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Utilities ─── */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+.serif { font-family: 'Cormorant Garamond', serif; }
+
+/* ─── Starfield background ─── */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,0.15), transparent),
+    radial-gradient(1px 1px at 45% 65%, rgba(255,255,255,0.1), transparent),
+    radial-gradient(1.2px 1.2px at 72% 18%, rgba(201,168,76,0.2), transparent),
+    radial-gradient(1px 1px at 88% 42%, rgba(255,255,255,0.08), transparent),
+    radial-gradient(1px 1px at 33% 82%, rgba(201,168,76,0.12), transparent),
+    radial-gradient(0.8px 0.8px at 60% 90%, rgba(255,255,255,0.12), transparent),
+    radial-gradient(1px 1px at 8% 55%, rgba(255,255,255,0.06), transparent),
+    radial-gradient(1.5px 1.5px at 52% 38%, rgba(201,168,76,0.15), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 20px 0;
+  backdrop-filter: blur(20px);
+  background: rgba(10, 10, 15, 0.7);
+  border-bottom: 1px solid var(--border-light);
+  transition: all 0.4s;
+}
+
+nav .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.nav-logo span { opacity: 0.5; }
+
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: transparent;
+  border: 1px solid var(--gold-dim);
+  color: var(--gold-light);
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 100px;
+  transition: all 0.3s;
+}
+
+.nav-cta:hover {
+  background: var(--gold);
+  color: var(--bg-deep);
+  border-color: var(--gold);
+}
+
+/* ─── HERO ─── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 140px 28px 80px;
+  z-index: 1;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -20%; left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 36px;
+  animation: fadeDown 1s ease-out;
+}
+
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content: '';
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim));
+}
+
+.hero-eyebrow::after {
+  background: linear-gradient(90deg, var(--gold-dim), transparent);
+}
+
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(2.8rem, 6.5vw, 4.8rem);
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 28px;
+  animation: fadeUp 1s ease-out 0.15s both;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--gold-light);
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: var(--text-dim);
+  max-width: 520px;
+  margin: 0 auto 48px;
+  line-height: 1.8;
+  animation: fadeUp 1s ease-out 0.3s both;
+}
+
+.hero-sub strong {
+  color: var(--text);
+  font-weight: 400;
+}
+
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: fadeUp 1s ease-out 0.45s both;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 48px;
+  background: linear-gradient(135deg, var(--gold) 0%, #b8943f 100%);
+  color: var(--bg-deep);
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 100px;
+  transition: all 0.35s;
+  box-shadow: 0 4px 30px rgba(201,168,76,0.25);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(201,168,76,0.35);
+}
+
+.hero-hint {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+}
+
+.hero-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 8px;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.hero-price .amount {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--gold-light);
+}
+
+.hero-price .label {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+/* Scroll indicator */
+.scroll-hint {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-faint);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  animation: fadeUp 1s ease-out 0.8s both;
+}
+
+.scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--gold-dim), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* ─── SECTION COMMONS ─── */
+section {
+  position: relative;
+  z-index: 1;
+  padding: 100px 0;
+}
+
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.section-desc {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  max-width: 560px;
+  line-height: 1.8;
+}
+
+.divider {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-dim), transparent);
+  margin: 100px auto;
+}
+
+/* ─── WHAT'S INSIDE ─── */
+.contents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2px;
+  margin-top: 60px;
+}
+
+.content-card {
+  padding: 36px 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  transition: all 0.35s;
+  position: relative;
+  overflow: hidden;
+}
+
+.content-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+
+.content-card:hover {
+  background: var(--bg-card-hover);
+}
+
+.content-card:hover::before {
+  opacity: 1;
+}
+
+.card-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  color: var(--gold-dim);
+  margin-bottom: 14px;
+  font-weight: 400;
+}
+
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.card-desc {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+/* ─── PDF PREVIEW SECTION ─── */
+.preview-section {
+  padding: 100px 0;
+}
+
+.preview-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.preview-mockup {
+  position: relative;
+  aspect-ratio: 210/297;
+  max-width: 380px;
+  background: linear-gradient(170deg, #1a1822, #12111a);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 32px 28px;
+  box-shadow: 
+    0 20px 60px rgba(0,0,0,0.5),
+    0 0 80px rgba(201,168,76,0.05);
+  overflow: hidden;
+}
+
+.preview-mockup::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold), var(--gold-dim));
+}
+
+.mock-header {
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.mock-label {
+  font-size: 0.5rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 8px;
+}
+
+.mock-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.mock-subtitle {
+  font-size: 0.65rem;
+  color: var(--text-faint);
+  margin-top: 4px;
+}
+
+.mock-table {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.mock-row {
+  display: flex;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.7rem;
+}
+
+.mock-planet {
+  width: 28px;
+  color: var(--gold-dim);
+  font-size: 0.9rem;
+}
+
+.mock-sign {
+  flex: 1;
+  color: var(--text-dim);
+}
+
+.mock-deg {
+  color: var(--text-faint);
+  font-size: 0.65rem;
+}
+
+.mock-house {
+  width: 40px;
+  text-align: right;
+  color: var(--violet);
+  font-size: 0.65rem;
+}
+
+.mock-text-block {
+  margin-top: 16px;
+}
+
+.mock-text-line {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-bottom: 8px;
+}
+
+.mock-text-line:nth-child(2) { width: 90%; }
+.mock-text-line:nth-child(3) { width: 75%; }
+.mock-text-line:nth-child(4) { width: 85%; }
+.mock-text-line:nth-child(5) { width: 60%; }
+
+.preview-features {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.preview-feature {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.pf-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 1.1rem;
+  color: var(--gold-dim);
+}
+
+.pf-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.pf-desc {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* ─── HOW IT WORKS ─── */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin-top: 60px;
+}
+
+.step {
+  text-align: center;
+  padding: 40px 24px;
+  position: relative;
+}
+
+.step-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.5rem;
+  font-weight: 300;
+  color: var(--border);
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.step-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-bottom: 12px;
+}
+
+.step-desc {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+.step + .step::before {
+  content: '→';
+  position: absolute;
+  left: -24px;
+  top: 56px;
+  font-size: 1.1rem;
+  color: var(--gold-dim);
+  opacity: 0.4;
+}
+
+/* ─── SOCIAL PROOF ─── */
+.proof-strip {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  padding: 48px 0;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  margin: 60px 0;
+}
+
+.proof-item {
+  text-align: center;
+}
+
+.proof-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 400;
+  color: var(--gold-light);
+  line-height: 1;
+}
+
+.proof-label {
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+}
+
+/* ─── FAQ ─── */
+.faq-list {
+  max-width: 680px;
+  margin: 50px auto 0;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border-light);
+  padding: 24px 0;
+  cursor: pointer;
+}
+
+.faq-q {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--text);
+  transition: color 0.3s;
+}
+
+.faq-q:hover { color: var(--gold-light); }
+
+.faq-toggle {
+  font-size: 1.2rem;
+  color: var(--gold-dim);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.faq-item.open .faq-toggle {
+  transform: rotate(45deg);
+}
+
+.faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+.faq-item.open .faq-a {
+  max-height: 200px;
+  padding-top: 16px;
+}
+
+/* ─── CTA FINAL ─── */
+.final-cta {
+  text-align: center;
+  padding: 120px 28px;
+  position: relative;
+}
+
+.final-cta::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.final-cta h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  font-weight: 300;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.final-cta h2 em {
+  font-style: italic;
+  color: var(--gold-light);
+}
+
+.final-sub {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  margin-bottom: 40px;
+}
+
+.price-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  margin-bottom: 32px;
+}
+
+.price-amount {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--gold-light);
+}
+
+.price-detail {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-align: left;
+  line-height: 1.4;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  position: relative;
+  z-index: 1;
+  padding: 40px 0;
+  border-top: 1px solid var(--border-light);
+  text-align: center;
+}
+
+footer p {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  letter-spacing: 0.05em;
+}
+
+footer a {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
+footer a:hover { color: var(--gold-light); }
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 0.8; transform: scaleY(1.2); }
+}
+
+/* Intersection observer fade-ins */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .preview-wrapper {
+    grid-template-columns: 1fr;
+    gap: 40px;
   }
 
-  /* NAV */
-  nav{
-    background:var(--paper);
-    border-bottom:1px solid var(--line);
-    padding:14px 24px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-  .nav-logo{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:.3px}
-  .nav-cta{
-    background:var(--gold);
-    color:#fff;
-    padding:8px 20px;
-    font-size:14px;
-    font-family:Georgia,serif;
-    border:none;
-    cursor:pointer;
-    text-decoration:none;
-    display:inline-block;
-  }
-  .nav-cta:hover{background:#8a6530}
-
-  /* HERO */
-  .hero{
-    max-width:700px;
-    margin:0 auto;
-    padding:80px 24px 64px;
-    text-align:center;
-  }
-  .eyebrow{
-    font-size:11px;
-    letter-spacing:3px;
-    text-transform:uppercase;
-    color:var(--gold);
-    margin-bottom:20px;
-  }
-  h1{
-    font-size:clamp(28px,5vw,46px);
-    line-height:1.12;
-    color:#0f0c08;
-    margin-bottom:20px;
-    font-weight:700;
-  }
-  .hero-sub{
-    font-size:17px;
-    color:var(--muted);
-    max-width:520px;
-    margin:0 auto 36px;
-    font-style:italic;
-  }
-  .price-badge{
-    display:inline-block;
-    background:var(--card);
-    border:1px solid var(--line);
-    padding:10px 24px;
-    font-size:22px;
-    font-weight:700;
-    color:var(--ink);
-    margin-bottom:28px;
-  }
-  .price-badge span{
-    font-size:13px;
-    font-weight:400;
-    color:var(--muted);
-    margin-left:6px;
-  }
-  .cta-btn{
-    display:inline-block;
-    background:var(--gold);
-    color:#fff;
-    padding:16px 40px;
-    font-size:17px;
-    font-family:Georgia,serif;
-    text-decoration:none;
-    border:none;
-    cursor:pointer;
-    letter-spacing:.3px;
-  }
-  .cta-btn:hover{background:#8a6530}
-  .cta-hint{
-    font-size:12px;
-    color:var(--muted);
-    margin-top:12px;
-    letter-spacing:.5px;
+  .preview-mockup {
+    max-width: 300px;
+    margin: 0 auto;
   }
 
-  /* DIVIDER */
-  .rule{
-    border:none;
-    border-top:1px solid var(--line);
-    max-width:80px;
-    margin:48px auto;
+  .steps {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 
-  /* WHAT YOU GET */
-  .section{
-    max-width:760px;
-    margin:0 auto;
-    padding:0 24px 64px;
-  }
-  .section-label{
-    font-size:10px;
-    letter-spacing:2.5px;
-    text-transform:uppercase;
-    color:var(--gold);
-    margin-bottom:12px;
-  }
-  h2{
-    font-size:clamp(20px,3vw,28px);
-    line-height:1.2;
-    color:#0f0c08;
-    margin-bottom:32px;
-    font-weight:700;
-  }
-  .features{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:1px;
-    background:var(--line);
-    border:1px solid var(--line);
-    margin-bottom:40px;
-  }
-  .feature{
-    background:var(--paper);
-    padding:20px 22px;
-  }
-  .feature-icon{font-size:18px;margin-bottom:8px}
-  .feature-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px}
-  .feature-desc{font-size:13px;color:var(--muted);line-height:1.55}
+  .step + .step::before { display: none; }
 
-  /* HOW IT WORKS */
-  .steps{
-    counter-reset:step;
-    display:flex;
-    flex-direction:column;
-    gap:0;
-    border:1px solid var(--line);
-  }
-  .step{
-    display:flex;
-    align-items:flex-start;
-    gap:20px;
-    padding:20px 22px;
-    border-bottom:1px solid var(--line);
-    background:var(--paper);
-  }
-  .step:last-child{border-bottom:none}
-  .step-num{
-    flex-shrink:0;
-    width:32px;
-    height:32px;
-    border:1px solid var(--line);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:13px;
-    font-weight:700;
-    color:var(--gold);
-    counter-increment:step;
-  }
-  .step-body{}
-  .step-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px}
-  .step-desc{font-size:13px;color:var(--muted);line-height:1.55}
-
-  /* SAMPLE */
-  .sample-box{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-top:3px solid var(--gold);
-    padding:24px 26px;
-    margin-bottom:40px;
-  }
-  .sample-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:16px}
-  .sample-list{list-style:none;padding:0}
-  .sample-list li{
-    padding:8px 0;
-    border-bottom:1px solid var(--line);
-    font-size:14px;
-    color:var(--ink);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-  .sample-list li:last-child{border-bottom:none}
-  .sample-list .pages{font-size:12px;color:var(--muted)}
-
-  /* REVIEWS */
-  .reviews{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:16px;
-    margin-bottom:40px;
-  }
-  .review{
-    background:var(--paper);
-    border:1px solid var(--line);
-    padding:18px 20px;
-  }
-  .review-stars{font-size:13px;color:var(--gold);margin-bottom:8px}
-  .review-text{font-size:13px;color:var(--ink);font-style:italic;line-height:1.6;margin-bottom:10px}
-  .review-name{font-size:11px;color:var(--muted);letter-spacing:.5px}
-
-  /* CTA BOTTOM */
-  .cta-section{
-    background:var(--paper);
-    border-top:1px solid var(--line);
-    text-align:center;
-    padding:64px 24px;
-  }
-  .cta-section h2{margin-bottom:12px}
-  .cta-section p{font-size:15px;color:var(--muted);margin-bottom:28px;font-style:italic}
-
-  /* FOOTER */
-  footer{
-    background:var(--card);
-    border-top:1px solid var(--line);
-    text-align:center;
-    padding:24px;
-    font-size:12px;
-    color:var(--muted);
+  .proof-strip {
+    flex-direction: column;
+    gap: 28px;
+    align-items: center;
   }
 
-  @media(max-width:500px){
-    .hero{padding:56px 16px 48px}
-    .section{padding:0 16px 48px}
+  .contents-grid {
+    grid-template-columns: 1fr;
   }
+
+  .hero { padding: 120px 20px 60px; }
+
+  .hero h1 { font-size: 2.4rem; }
+
+  section { padding: 60px 0; }
+}
 </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
-  <span class="nav-logo">✦ Натальная карта</span>
-  <a class="nav-cta" href="https://t.me/natal_karta_ai_bot">Открыть бота</a>
+  <div class="container">
+    <a href="#" class="nav-logo">✦ НАТАЛЬНАЯ КАРТА <span>AI</span></a>
+    <a href="https://t.me/natal_karta_ai_bot" class="nav-cta" target="_blank">
+      Открыть бота
+    </a>
+  </div>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
-  <p class="eyebrow">Персональный астрологический анализ</p>
-  <h1>Что говорят звёзды о твоей личности</h1>
-  <p class="hero-sub">27 страниц глубокого разбора — планеты, дома, нумерология, Таро и прогноз на год</p>
-  <div class="price-badge">800 ₽ <span>полный PDF-отчёт</span></div>
-  <br>
-  <a class="cta-btn" href="https://t.me/natal_karta_ai_bot">Получить натальную карту</a>
-  <p class="cta-hint">Telegram · готово за ~60 секунд</p>
-</section>
-
-<hr class="rule">
-
-<section class="section">
-  <p class="section-label">Что входит в отчёт</p>
-  <h2>27 страниц персонального анализа</h2>
-
-  <div class="sample-box">
-    <div class="sample-title">Содержание отчёта</div>
-    <ul class="sample-list">
-      <li>Натальная карта — все планеты с градусами и домами <span class="pages">2 стр.</span></li>
-      <li>Анализ каждой планеты — знак, дом, аспекты <span class="pages">6 стр.</span></li>
-      <li>12 домов — сферы жизни и их расшифровка <span class="pages">4 стр.</span></li>
-      <li>Ключевые аспекты натальной карты <span class="pages">3 стр.</span></li>
-      <li>Нумерология — число жизненного пути, судьбы, души <span class="pages">2 стр.</span></li>
-      <li>Китайский гороскоп и карта Таро <span class="pages">2 стр.</span></li>
-      <li>Транзиты и прогноз на ближайшие 12 месяцев <span class="pages">4 стр.</span></li>
-      <li>7 персональных рекомендаций <span class="pages">3 стр.</span></li>
-      <li>Итоговый вердикт и графическое колесо карты <span class="pages">1 стр.</span></li>
-    </ul>
+  <div>
+    <div class="hero-eyebrow">персональный астрологический анализ</div>
+    <h1>Что скрыто<br>в <em>твоей</em> карте рождения</h1>
+    <p class="hero-sub">
+      <strong>27 страниц</strong> глубокого разбора — от точных позиций планет<br>
+      до прогноза на ближайший год. Готово за 60 секунд.
+    </p>
+    <div class="hero-actions">
+      <a href="https://t.me/natal_karta_ai_bot" class="btn-primary" target="_blank">
+        Получить натальную карту
+      </a>
+      <div class="hero-price">
+        <span class="amount">800 ₽</span>
+        <span class="label">· полный PDF-отчёт</span>
+      </div>
+      <span class="hero-hint">Бесплатный мини-разбор сразу в Telegram</span>
+    </div>
   </div>
-
-  <div class="features">
-    <div class="feature">
-      <div class="feature-icon">🪐</div>
-      <div class="feature-title">Точные эфемериды</div>
-      <div class="feature-desc">Позиции планет рассчитываются по реальным астрономическим данным для твоего времени и места рождения</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">🔢</div>
-      <div class="feature-title">Нумерология</div>
-      <div class="feature-desc">Число жизненного пути, судьбы, души и личности — по системе Пифагора</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">🃏</div>
-      <div class="feature-title">Карта Таро</div>
-      <div class="feature-desc">Аркан по числу жизненного пути — архетип, сильные стороны и теневые качества</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">🀄</div>
-      <div class="feature-title">Китайский гороскоп</div>
-      <div class="feature-desc">Знак года, стихия, совместимость и характер в восточной традиции</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">📈</div>
-      <div class="feature-title">Прогноз на год</div>
-      <div class="feature-desc">Актуальные транзиты медленных планет к твоей натальной карте</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">🌐</div>
-      <div class="feature-title">Колесо карты</div>
-      <div class="feature-desc">Графическое изображение натальной карты, встроенное в PDF</div>
-    </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
   </div>
 </section>
 
-<hr class="rule">
-
-<section class="section">
-  <p class="section-label">Как это работает</p>
-  <h2>Три шага до готового отчёта</h2>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <div class="step-title">Открой бота и введи данные</div>
-        <div class="step-desc">Дата рождения, время и город. Чем точнее время — тем глубже анализ домов и асцендента</div>
-      </div>
+<!-- WHAT'S INSIDE -->
+<section>
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Содержание отчёта</div>
+      <div class="section-title">Восемь разделов.<br>Ничего поверхностного.</div>
     </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-body">
-        <div class="step-title">Получи бесплатный мини-разбор</div>
-        <div class="step-desc">Солнце, Луна, суперсила и главный вызов — сразу, без оплаты</div>
+    <div class="contents-grid reveal">
+      <div class="content-card">
+        <div class="card-num">I</div>
+        <div class="card-title">Натальная карта</div>
+        <div class="card-desc">Все планеты с точными градусами, знаками и домами. Таблица стихий и модальностей.</div>
       </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-body">
-        <div class="step-title">Закажи полный отчёт за 800 ₽</div>
-        <div class="step-desc">PDF готов примерно за 60 секунд. Приходит прямо в Telegram</div>
+      <div class="content-card">
+        <div class="card-num">II</div>
+        <div class="card-title">Анализ планет</div>
+        <div class="card-desc">Каждая планета — отдельный разбор: знак, дом, аспекты, психологическое значение.</div>
+      </div>
+      <div class="content-card">
+        <div class="card-num">III</div>
+        <div class="card-title">12 домов</div>
+        <div class="card-desc">Карьера, отношения, финансы, здоровье — расшифровка каждой сферы жизни.</div>
+      </div>
+      <div class="content-card">
+        <div class="card-num">IV</div>
+        <div class="card-title">Аспекты</div>
+        <div class="card-desc">Ключевые связи между планетами — что усиливает, что создаёт напряжение.</div>
+      </div>
+      <div class="content-card">
+        <div class="card-num">V</div>
+        <div class="card-title">Нумерология</div>
+        <div class="card-desc">Число жизненного пути, судьбы, души и личности по системе Пифагора.</div>
+      </div>
+      <div class="content-card">
+        <div class="card-num">VI</div>
+        <div class="card-title">Карта Таро и Восток</div>
+        <div class="card-desc">Аркан по числу пути, китайский гороскоп — знак, стихия, характер.</div>
+      </div>
+      <div class="content-card">
+        <div class="card-num">VII</div>
+        <div class="card-title">Прогноз на год</div>
+        <div class="card-desc">Актуальные транзиты к твоей карте — что ждать в карьере, отношениях, финансах.</div>
+      </div>
+      <div class="content-card">
+        <div class="card-num">VIII</div>
+        <div class="card-title">Рекомендации</div>
+        <div class="card-desc">Персональные советы и итоговый синтез всех линий карты.</div>
       </div>
     </div>
   </div>
 </section>
 
-<hr class="rule">
+<div class="divider"></div>
 
-<section class="section">
-  <p class="section-label">Отзывы</p>
-  <h2>Что говорят пользователи</h2>
-  <div class="reviews">
-    <div class="review">
-      <div class="review-stars">⭐⭐⭐⭐⭐</div>
-      <div class="review-text">Очень точно попало в характер. Прочитала на одном дыхании, много нового поняла про себя.</div>
-      <div class="review-name">Анна · Натальная карта</div>
+<!-- PDF PREVIEW -->
+<section class="preview-section">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Пример отчёта</div>
+      <div class="section-title">Так выглядит твой отчёт</div>
+      <p class="section-desc">Не абстрактные обещания — реальная страница из готового PDF.</p>
     </div>
-    <div class="review">
-      <div class="review-stars">⭐⭐⭐⭐⭐</div>
-      <div class="review-text">Подробно, без воды. Раздел про карьеру и транзиты особенно понравился — конкретно и по делу.</div>
-      <div class="review-name">Михаил · Натальная карта</div>
-    </div>
-    <div class="review">
-      <div class="review-stars">⭐⭐⭐⭐</div>
-      <div class="review-text">Хороший отчёт, 27 страниц это не мало. Особенно порадовало колесо карты в PDF.</div>
-      <div class="review-name">Елена · Натальная карта</div>
+    <div class="preview-wrapper reveal">
+      <div class="preview-mockup">
+        <div class="mock-header">
+          <div class="mock-label">Персональный астрологический анализ</div>
+          <div class="mock-name">Павел</div>
+          <div class="mock-subtitle">19 июня 1986 · 03:20 · Усть-Донецкий</div>
+        </div>
+        <div class="mock-table">
+          <div class="mock-row">
+            <span class="mock-planet">☀</span>
+            <span class="mock-sign">Близнецы ♊</span>
+            <span class="mock-deg">27.4°</span>
+            <span class="mock-house">II дом</span>
+          </div>
+          <div class="mock-row">
+            <span class="mock-planet">☽</span>
+            <span class="mock-sign">Скорпион ♏</span>
+            <span class="mock-deg">12.5°</span>
+            <span class="mock-house">VI дом</span>
+          </div>
+          <div class="mock-row">
+            <span class="mock-planet">☿</span>
+            <span class="mock-sign">Рак ♋</span>
+            <span class="mock-deg">21.5°</span>
+            <span class="mock-house">III дом</span>
+          </div>
+          <div class="mock-row">
+            <span class="mock-planet">♀</span>
+            <span class="mock-sign">Лев ♌</span>
+            <span class="mock-deg">3.7°</span>
+            <span class="mock-house">IV дом</span>
+          </div>
+          <div class="mock-row">
+            <span class="mock-planet">♂</span>
+            <span class="mock-sign">Козерог ♑</span>
+            <span class="mock-deg">22.5°</span>
+            <span class="mock-house">IX дом</span>
+          </div>
+          <div class="mock-row">
+            <span class="mock-planet">♃</span>
+            <span class="mock-sign">Рыбы ♓</span>
+            <span class="mock-deg">22.0°</span>
+            <span class="mock-house">XI дом</span>
+          </div>
+        </div>
+        <div class="mock-text-block">
+          <div class="mock-text-line"></div>
+          <div class="mock-text-line"></div>
+          <div class="mock-text-line"></div>
+          <div class="mock-text-line"></div>
+          <div class="mock-text-line"></div>
+        </div>
+      </div>
+      <div class="preview-features">
+        <div class="preview-feature">
+          <div class="pf-icon">☽</div>
+          <div>
+            <div class="pf-title">Реальные эфемериды</div>
+            <div class="pf-desc">Позиции планет рассчитаны по точным астрономическим данным для твоего времени и города рождения.</div>
+          </div>
+        </div>
+        <div class="preview-feature">
+          <div class="pf-icon">⊕</div>
+          <div>
+            <div class="pf-title">Синтез четырёх систем</div>
+            <div class="pf-desc">Западная астрология, нумерология Пифагора, Таро и китайский гороскоп — всё в одном отчёте.</div>
+          </div>
+        </div>
+        <div class="preview-feature">
+          <div class="pf-icon">☊</div>
+          <div>
+            <div class="pf-title">Прогноз на 12 месяцев</div>
+            <div class="pf-desc">Транзиты рассчитаны от даты заказа — конкретные периоды и рекомендации, не абстрактные годы.</div>
+          </div>
+        </div>
+        <div class="preview-feature">
+          <div class="pf-icon">✦</div>
+          <div>
+            <div class="pf-title">Колесо натальной карты</div>
+            <div class="pf-desc">Графическое изображение карты встроено прямо в PDF — можно распечатать и повесить на стену.</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="cta-section">
-  <p class="section-label" style="margin-bottom:12px">Готов?</p>
-  <h2>Узнай что написано в твоей карте</h2>
-  <p>Бесплатный мини-разбор — сразу. Полный PDF за 800 ₽ — за 60 секунд.</p>
-  <a class="cta-btn" href="https://t.me/natal_karta_ai_bot">Открыть бота в Telegram</a>
-  <p class="cta-hint" style="margin-top:14px">Работает 24/7 · Оплата картой через Telegram</p>
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section>
+  <div class="container" style="text-align: center;">
+    <div class="reveal">
+      <div class="section-label" style="text-align: center;">Как это работает</div>
+      <div class="section-title" style="text-align: center;">Три шага — одна минута</div>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Открой бота</div>
+        <div class="step-desc">Введи дату, время и город рождения. Чем точнее время — тем глубже анализ. Бот даст бесплатный мини-разбор сразу.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Оплати 800 ₽</div>
+        <div class="step-desc">Безопасная оплата картой прямо в Telegram через ЮKassa. Занимает 30 секунд.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Получи PDF</div>
+        <div class="step-desc">Через ~60 секунд бот отправит полный отчёт. Читай в любое время, возвращайся к разделам.</div>
+      </div>
+    </div>
+
+    <!-- Social proof strip -->
+    <div class="proof-strip reveal">
+      <div class="proof-item">
+        <div class="proof-num">27</div>
+        <div class="proof-label">страниц в отчёте</div>
+      </div>
+      <div class="proof-item">
+        <div class="proof-num">~60 сек</div>
+        <div class="proof-label">время генерации</div>
+      </div>
+      <div class="proof-item">
+        <div class="proof-num">4</div>
+        <div class="proof-label">системы анализа</div>
+      </div>
+    </div>
+  </div>
 </section>
 
+<!-- FAQ -->
+<section>
+  <div class="container">
+    <div class="reveal" style="text-align: center;">
+      <div class="section-label">Частые вопросы</div>
+      <div class="section-title">Ответы на главное</div>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          А если я не знаю точное время рождения?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a">Бот рассчитает карту и без точного времени, но некоторые разделы (асцендент, точные дома) будут менее точными. Если знаете хотя бы примерное время — уже хорошо. Можно уточнить в свидетельстве о рождении.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          Это AI или живой астролог?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a">Отчёт генерируется с помощью AI на основе точных астрономических эфемерид. Позиции планет — реальные, расчёты — математические. AI синтезирует интерпретации на основе классических астрологических методик.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          В каком формате придёт отчёт?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a">Вы получите PDF и HTML-версию прямо в Telegram. PDF удобно сохранять и распечатывать, HTML — читать с телефона.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          Можно ли заказать карту в подарок?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a">Да, просто введите данные рождения другого человека. Отчёт придёт вам — сможете переслать как подарок.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          Насколько это серьёзный анализ?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a">27 страниц с анализом каждой планеты, каждого дома, ключевых аспектов, нумерологией, прогнозом транзитов на год и персональными рекомендациями. Это не краткая справка — это полноценный разбор.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container reveal">
+    <h2>Узнай, что написано<br>в <em>твоих</em> звёздах</h2>
+    <p class="final-sub">Начни с бесплатного мини-разбора — без оплаты, прямо сейчас</p>
+    <div class="price-badge">
+      <span class="price-amount">800 ₽</span>
+      <span class="price-detail">полный PDF-отчёт<br>27 страниц</span>
+    </div>
+    <br><br>
+    <a href="https://t.me/natal_karta_ai_bot" class="btn-primary" target="_blank">
+      Открыть бота в Telegram
+    </a>
+    <br><br>
+    <span class="hero-hint">Бесплатный мини-разбор · Полный PDF за 60 секунд</span>
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer>
-  © 2026 Натальная карта · <a href="https://t.me/natal_karta_ai_bot" style="color:var(--muted)">@natal_karta_ai_bot</a>
+  <div class="container">
+    <p>© 2026 Натальная карта · <a href="https://t.me/natal_karta_ai_bot">@natal_karta_ai_bot</a></p>
+  </div>
 </footer>
+
+<script>
+// FAQ toggle
+function toggleFaq(item) {
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
 
 </body>
 </html>
